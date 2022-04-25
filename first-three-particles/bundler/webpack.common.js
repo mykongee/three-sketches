@@ -1,4 +1,5 @@
 const HtmlWebpackPlugin = require('html-webpack-plugin');
+const CopyWebpackPlugin = require('copy-webpack-plugin');
 const path = require('path');
 
 module.exports = {
@@ -10,6 +11,11 @@ module.exports = {
     },
     devtool: 'source-map',
     plugins: [
+        new CopyWebpackPlugin({
+            patterns: [
+                { from: path.resolve(__dirname, '../static') }
+            ]
+        }),
         new HtmlWebpackPlugin({
             template: path.resolve(__dirname, '../src/index.html'),
             minify: true
