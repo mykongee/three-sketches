@@ -1,12 +1,58 @@
 import './style.css';
 import * as THREE from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
+import { Vector3 } from 'three';
+
+const baseVector3 = new Vector3(1, 1, 1);
+
+const material = new THREE.ShaderMaterial({
+    uniforms: {
+        thickness: {
+            value: 1.5
+        }
+    },
+    vertexShader: vertexShader,
+    fragmentShader: fragmentShader
+})
+
+const geometry = new THREE.BoxGeometry(baseVector3);
+
+function createBoxMesh() {
+    const mesh = new THREE.Mesh(geometry, material);
+    return mesh;
+}
+
+function createScene() {
+
+}
 
 // -- Constants and Window EventListeners
 const sizes = {
     width: 480,
     height: 240
 }
+
+window.addEventListener('resize', () => {
+    // Update measurements in reference object
+    sizes.width = window.innerWidth/3;
+    sizes.height = window.innerHeight/3;
+
+    // Update camera
+    camera1.aspect = sizes.width / sizes.height;
+    camera1.updateProjectionMatrix();
+
+    camera2.aspect = sizes.width / sizes.height;
+    camera2.updateProjectionMatrix();
+
+    // Update renderer to resize canvas
+    // And handles case if user moves window to different screens
+    renderer1.setSize(sizes.width, sizes.height);
+    renderer1.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+
+    renderer2.setSize(sizes.width, sizes.height);
+    renderer2.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+}) 
+
 
 // TODO: Make factory functions for meshes, scenes, and renderers (make DRY)
 // TODO: Animate only on mouse hover
@@ -79,6 +125,12 @@ renderer2.setSize(sizes.width, sizes.height);
 renderer2.setClearColor('lavender', 1);
 renderer2.render(scene2, camera2);
 
+const renderer3 = new THREE.WebGLRenderer({
+    canvas: canvas3,
+    alpha: true
+})
+renderer3.setClearColor('lavender', 1);
+renderer3.render(scene2, camera2);
 
 // -- Animation
 const clock = new THREE.Clock();
@@ -91,16 +143,27 @@ const tick = () => {
     mesh1.rotation.x = elapsedTime/2;
     mesh1.rotation.y = elapsedTime/2;
 
-    // Behavior 1 - boop
+    // Animation 1 - boop
     mesh1.position.x = -2 * Math.tan(elapsedTime*1);
     mesh1.position.z = 1 * Math.abs(Math.sin(elapsedTime)*2.5);
-
+    
+    // Animation 2 - yo-yo
     mesh2.position.x = Math.sin(elapsedTime/1);
     mesh2.position.y = Math.tan(elapsedTime*1);
     camera2.lookAt(mesh2.position);
 
+    // Animation 3 - so close yet so far
+    // mesh.position.z = Math.tan(elapsedTime)/2;
+    // camera.position.z = elapsedTime*1.5;
+
     renderer1.render(scene1, camera1);
     renderer2.render(scene2, camera2);
+
+    if (parseInt(elapsedTime) % 2 === 0) {
+        renderer3.render(scene2, camera1); // TODO: experiment with different renderers, but alternate scene/camera
+    } else {
+        renderer3.render(scene1, camera1); // TODO: experiment with different renderers, but alternate scene/camera
+    }
     window.requestAnimationFrame(tick);
 }
 
