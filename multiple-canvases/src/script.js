@@ -2,9 +2,10 @@ import './style.css';
 import * as THREE from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 import { Vector3 } from 'three';
+import { Scene } from 'three';
 
+const renderers = [];
 const baseVector3 = new Vector3(1, 1, 1);
-
 const material = new THREE.ShaderMaterial({
     uniforms: {
         thickness: {
@@ -14,10 +15,9 @@ const material = new THREE.ShaderMaterial({
     vertexShader: vertexShader,
     fragmentShader: fragmentShader
 })
-
 const geometry = new THREE.BoxGeometry(baseVector3);
 
-function createBoxMesh() {
+function createMesh() {
     const mesh = new THREE.Mesh(geometry, material);
     return mesh;
 }
@@ -134,16 +134,32 @@ renderer3.render(scene2, camera2);
 
 // -- Animation
 const clock = new THREE.Clock();
+
+
+// interface AnimationScene {
+//     scene: Scene,
+//     animation: Animation
+// }
+
 const tick = () => {
     const elapsedTime = clock.getElapsedTime();
     controls1.update();
     controls2.update();
+    
+    // TODO: implement function to apply a specific animation to a mesh
+    // How to represent animation? Might have to hardcode
+    function applyAnimation(mesh, animationId) {
+        
+    }
 
-    // Update objects
-    mesh1.rotation.x = elapsedTime/2;
-    mesh1.rotation.y = elapsedTime/2;
+    // One mesh per renderer
+    for (const i = 0; i < renderers.length; i++) {
+        applyAnimation(mesh[i], i);
+    }
 
     // Animation 1 - boop
+    mesh1.rotation.x = elapsedTime/2;
+    mesh1.rotation.y = elapsedTime/2;
     mesh1.position.x = -2 * Math.tan(elapsedTime*1);
     mesh1.position.z = 1 * Math.abs(Math.sin(elapsedTime)*2.5);
     
@@ -157,12 +173,15 @@ const tick = () => {
     // camera.position.z = elapsedTime*1.5;
 
     renderer1.render(scene1, camera1);
+    // renderer1.autoClear = false; // Interesting behavior!
     renderer2.render(scene2, camera2);
 
-    if (parseInt(elapsedTime) % 2 === 0) {
-        renderer3.render(scene2, camera1); // TODO: experiment with different renderers, but alternate scene/camera
+    // TODO: experiment with different renderers, but alternate scene/camera 
+    // Interesting experiment
+    if (parseInt(elapsedTime) % 3 === 0) {
+        renderer3.render(scene2, camera1); 
     } else {
-        renderer3.render(scene1, camera1); // TODO: experiment with different renderers, but alternate scene/camera
+        renderer3.render(scene1, camera1); 
     }
     window.requestAnimationFrame(tick);
 }
