@@ -178,11 +178,12 @@ const tick = () => {
 
     // TODO: experiment with different renderers, but alternate scene/camera 
     // Interesting experiment
-    if (parseInt(elapsedTime) % 3 === 0) {
-        renderer3.render(scene2, camera1); 
-    } else {
-        renderer3.render(scene1, camera1); 
-    }
+    // if (parseInt(elapsedTime) % 3 === 0) {
+    //     renderer3.render(scene2, camera1); 
+    // } else {
+    //     renderer3.render(scene1, camera1); 
+    // }
+    renderer3.render(scene1, camera1); 
     window.requestAnimationFrame(tick);
 }
 
